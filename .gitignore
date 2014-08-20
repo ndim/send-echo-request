@@ -1,23 +1,13 @@
-# Object files
+# editor backup files
+*~
+
+# generated sources
+/git-version.h
+/usage-msg.h
+
+# generated compilation products
 *.o
-*.ko
-*.obj
-*.elf
-
-# Libraries
-*.lib
-*.a
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+*.s
+/send-echo-request
+/send-echo-request.lss
+/send-echo-request.sym
