@@ -235,10 +235,10 @@ uint16_t icmp_checksum(const uint16_t *data, const size_t byte_sz)
 
 
 static
-int ping4_addr(struct sockaddr_in *dest_addr,
+int send_ping4(struct sockaddr_in *dest_addr,
 	       const uint16_t sequenceno, const char *dest_str)
 {
-  verbosef("ping4_addr %s", dest_str);
+  verbosef("send_ping4 %s", dest_str);
   veryverbosef("%-13s %d", "sin_family", dest_addr->sin_family);
   veryverbosef("%-13s %u.%u.%u.%u", "sin_addr",
 	       (ntohl(dest_addr->sin_addr.s_addr) & 0xff000000) >> 24,
@@ -258,16 +258,19 @@ int ping4_addr(struct sockaddr_in *dest_addr,
     return 1;
   }
 
+  /* compose ICMP packet */
   struct icmphdr hdr;
   memset(&hdr, 0, sizeof(hdr));
-  hdr.type = ICMP_ECHO; /* ICMP echo request */
-  hdr.code = 0;
-  hdr.checksum = 0;     /* required for actual checksum calculation */
+  hdr.type             = ICMP_ECHO;         /* ICMP echo request */
+  hdr.code             = 0;
+  hdr.checksum         = 0;  /* required for actual checksum calculation */
   hdr.un.echo.id       = htons(IDENTIFIER); /* identifier */
   hdr.un.echo.sequence = htons(sequenceno); /* sequence no */
 
+  /* Fill out the ICMP checksum */
   hdr.checksum = icmp_checksum((uint16_t *)&hdr, sizeof(hdr));
 
+  /* send the echo request packet */
   const ssize_t sent_bytes =
     sendto(sock,
 	   &hdr, sizeof(hdr),
@@ -284,10 +287,10 @@ int ping4_addr(struct sockaddr_in *dest_addr,
 
 
 static
-int ping6_addr(struct sockaddr_in6 *dest_addr,
+int send_ping6(struct sockaddr_in6 *dest_addr,
 	       const uint16_t sequenceno, const char *dest_str)
 {
-  verbosef("ping6_addr %s", dest_str);
+  verbosef("send_ping6 %s", dest_str);
   veryverbosef("%-13s %d", "sin6_family", dest_addr->sin6_family);
   veryverbosef("%-13s %d", "sin6_port", ntohs(dest_addr->sin6_port));
   veryverbosef("%-13s 0x%08x", "sin6_flowinfo", dest_addr->sin6_flowinfo);
@@ -317,15 +320,18 @@ int ping6_addr(struct sockaddr_in6 *dest_addr,
   if (dry_run) {
     return 0;
   }
+
   const int sock = socket(AF_INET6, SOCK_RAW, IPPROTO_ICMPV6);
   if (sock < 0) {
     quietfe("socket(AF_INET6, SOCK_RAW, IPPROTO_ICMPV6)");
     return 1;
   }
 
+  /* compose ICMPv6 packet */
   struct icmp6_hdr hdr;
-  hdr.icmp6_type = ICMP6_ECHO_REQUEST;
-  hdr.icmp6_code = 0;
+  memset(&hdr, 0, sizeof(hdr));
+  hdr.icmp6_type                      = ICMP6_ECHO_REQUEST;
+  hdr.icmp6_code                      = 0;
   hdr.icmp6_dataun.icmp6_un_data16[0] = htons(IDENTIFIER); /* identifier */
   hdr.icmp6_dataun.icmp6_un_data16[1] = htons(sequenceno); /* sequence no */
 
@@ -339,6 +345,7 @@ int ping6_addr(struct sockaddr_in6 *dest_addr,
     return 1;
   }
 
+  /* send the echo request packet */
   const ssize_t sent_bytes =
     sendto(sock,
 	   &hdr, sizeof(hdr),
@@ -482,13 +489,13 @@ int main(int argc, char *argv[])
       case AF_UNSPEC:
 	return 0;
       case AF_INET:
-	if (ping4_addr((struct sockaddr_in *) &pingitems[i].sas,
+	if (send_ping4((struct sockaddr_in *) &pingitems[i].sas,
 		       sequenceno, pingitems[i].addr_str)) {
 	  ++ping_errors;
 	}
 	break;
       case AF_INET6:
-	if (ping6_addr((struct sockaddr_in6 *) &pingitems[i].sas,
+	if (send_ping6((struct sockaddr_in6 *) &pingitems[i].sas,
 		       sequenceno, pingitems[i].addr_str)) {
 	  ++ping_errors;
 	}
