@@ -392,7 +392,8 @@ int main(int argc, char *argv[])
 #define enlarge_array(addrstr)						\
   pingitems = realloc(pingitems, sizeof(pingitems[0]) * (pi_cnt + 1));	\
   if (!pingitems) {							\
-    error_exit("realloc");						\
+    quietfe("realloc");							\
+    exit(EXIT_FAILURE);							\
   }									\
   memset(&pingitems[pi_cnt], 0, sizeof(pingitems[pi_cnt]));		\
   pingitems[pi_cnt].addr_str = addrstr;
