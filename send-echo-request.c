@@ -374,25 +374,25 @@ typedef struct {
   const char *addr_str;
   struct sockaddr_storage sas;
   struct timespec delay;
-} pingitem_T;
+} task_T;
 
 
 int main(int argc, char *argv[])
 {
-  int         pi_cnt    = 0;
-  pingitem_T *pingitems = NULL;
+  int     task_cnt = 0;
+  task_T *tasks    = NULL;
 
 
   /*** parse command line ***/
 
-#define enlarge_array(addrstr)						\
-  pingitems = realloc(pingitems, sizeof(pingitems[0]) * (pi_cnt + 1));	\
-  if (!pingitems) {							\
-    quietfe("realloc");							\
-    exit(EXIT_FAILURE);							\
-  }									\
-  memset(&pingitems[pi_cnt], 0, sizeof(pingitems[pi_cnt]));		\
-  pingitems[pi_cnt].addr_str = addrstr;
+#define enlarge_array(addrstr)				     \
+  tasks = realloc(tasks, sizeof(tasks[0]) * (task_cnt + 1)); \
+  if (!tasks) {						     \
+    quietfe("realloc");					     \
+    exit(EXIT_FAILURE);					     \
+  }							     \
+  memset(&tasks[task_cnt], 0, sizeof(tasks[task_cnt]));	     \
+  tasks[task_cnt].addr_str = addrstr;
 
 
   for (int i=1; i<argc; ++i) {
@@ -407,8 +407,8 @@ int main(int argc, char *argv[])
     /* These blocks should either
      *   exit          to exit the program
      *   return        to exit the program
-     *   <do nothing>  to clean up the adding of a pingitem
-     *   continue      having not added a pingitem
+     *   <do nothing>  to clean up the adding of a task
+     *   continue      having not added a task
      */
     if (0 == strcmp("--help", arg)) {
       print_usage();
@@ -467,23 +467,23 @@ int main(int argc, char *argv[])
     } else if (1 == inet_pton(AF_INET6, arg, &u.sin6.sin6_addr)) {
       enlarge_array(arg);
       u.sin6.sin6_family = AF_INET6;
-      memcpy(&pingitems[pi_cnt].sas, &u.sin6, sizeof(u.sin6));
+      memcpy(&tasks[task_cnt].sas, &u.sin6, sizeof(u.sin6));
     } else if (1 == inet_pton(AF_INET, arg, &u.sin.sin_addr)) {
       enlarge_array(arg);
       u.sin.sin_family = AF_INET;
-      memcpy(&pingitems[pi_cnt].sas, &u.sin, sizeof(u.sin));
+      memcpy(&tasks[task_cnt].sas, &u.sin, sizeof(u.sin));
     } else {
       error_exitf("Cannot parse address: %s", arg);
     }
 
-    pingitems[pi_cnt].delay.tv_sec  = 0;
-    pingitems[pi_cnt].delay.tv_nsec = 500000000;
-    ++pi_cnt;
+    tasks[task_cnt].delay.tv_sec  = 0;
+    tasks[task_cnt].delay.tv_nsec = 500000000;
+    ++task_cnt;
   }
 
 #undef enlarge_array
 
-  if (pi_cnt == 0) {
+  if (task_cnt == 0) {
     error_exit("No adress(es) given");
   }
 
@@ -495,32 +495,32 @@ int main(int argc, char *argv[])
     normalf("sequenceno %u", sequenceno);
 
     int ping_errors = 0;
-    for (int i=0; i<pi_cnt; ++i) {
-      switch (pingitems[i].sas.ss_family) {
+    for (int i=0; i<task_cnt; ++i) {
+      switch (tasks[i].sas.ss_family) {
       case AF_UNSPEC:
 	return 0;
       case AF_INET:
-	if (send_ping4((struct sockaddr_in *) &pingitems[i].sas,
-		       sequenceno, pingitems[i].addr_str)) {
+	if (send_ping4((struct sockaddr_in *) &tasks[i].sas,
+		       sequenceno, tasks[i].addr_str)) {
 	  ++ping_errors;
 	}
 	break;
       case AF_INET6:
-	if (send_ping6((struct sockaddr_in6 *) &pingitems[i].sas,
-		       sequenceno, pingitems[i].addr_str)) {
+	if (send_ping6((struct sockaddr_in6 *) &tasks[i].sas,
+		       sequenceno, tasks[i].addr_str)) {
 	  ++ping_errors;
 	}
 	break;
       default:
-	error_exitf("Invalid ss_family %u", pingitems[i].sas.ss_family);
+	error_exitf("Invalid ss_family %u", tasks[i].sas.ss_family);
       }
 
       struct timespec rem_ts;
-      nanosleep(&pingitems[i].delay, &rem_ts);
+      nanosleep(&tasks[i].delay, &rem_ts);
       /* ignore rem_ts value */
     }
     if (ping_errors) {
-      normalf("ping_errors %u/%u", ping_errors, pi_cnt);
+      normalf("ping_errors %u/%u", ping_errors, task_cnt);
     }
 
     if (!do_loop) {
