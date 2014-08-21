@@ -268,7 +268,7 @@ int send_ping4(struct sockaddr_in *dest_addr,
   hdr.un.echo.sequence = htons(sequenceno); /* sequence no */
 
   /* Fill out the ICMP checksum */
-  hdr.checksum = icmp_checksum((uint16_t *)&hdr, sizeof(hdr));
+  hdr.checksum         = icmp_checksum((uint16_t *)&hdr, sizeof(hdr));
 
   /* send the echo request packet */
   const ssize_t sent_bytes =
@@ -379,15 +379,11 @@ typedef struct {
 
 int main(int argc, char *argv[])
 {
+  int         pi_cnt    = 0;
   pingitem_T *pingitems = NULL;
-  int pi_cnt = 0;
+
 
   /*** parse command line ***/
-
-  union {
-    struct sockaddr_in sin;
-    struct sockaddr_in6 sin6;
-  } u;
 
 #define enlarge_array(addrstr)						\
   pingitems = realloc(pingitems, sizeof(pingitems[0]) * (pi_cnt + 1));	\
@@ -398,10 +394,22 @@ int main(int argc, char *argv[])
   memset(&pingitems[pi_cnt], 0, sizeof(pingitems[pi_cnt]));		\
   pingitems[pi_cnt].addr_str = addrstr;
 
+
   for (int i=1; i<argc; ++i) {
     const char *arg = argv[i];
+
+    union {
+      struct sockaddr_in  sin;
+      struct sockaddr_in6 sin6;
+    } u;
     memset(&u, 0, sizeof(u));
 
+    /* These blocks should either
+     *   exit          to exit the program
+     *   return        to exit the program
+     *   <do nothing>  to clean up the adding of a pingitem
+     *   continue      having not added a pingitem
+     */
     if (0 == strcmp("--help", arg)) {
       print_usage();
       return 0;
@@ -472,11 +480,13 @@ int main(int argc, char *argv[])
     pingitems[pi_cnt].delay.tv_nsec = 500000000;
     ++pi_cnt;
   }
+
 #undef enlarge_array
 
   if (pi_cnt == 0) {
     error_exit("No adress(es) given");
   }
+
 
   /*** main loop ***/
 
