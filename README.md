@@ -1,15 +1,16 @@
 send-echo-request
 =================
 
-`send-echo-request` sends an ICMP (IPv4) or ICMPv6 echo request to a
-list of addresses without waiting for the echo reply packets. Between
-every packet sent, there is a constant delay of about 0.5s.
+`send-echo-request` sends one ICMP (IPv4) or ICMPv6 echo request each
+to a list of addresses without waiting for the echo reply packets. A
+packet is sent every 0.5 seconds. Optionally, sending the packets is
+repeated in an infinite loop.
 
-As `send-echo-request` does not wait for any echo reply packets,
-processing the received reply packets must be done in another system,
-e.g. in `iptables` like my
+As `send-echo-request` does not wait for or evaluate any echo reply
+packets, processing the received reply packets must be done in another
+place, e.g. in `iptables` like my
 [someone else is using the internet LED (YUP LED)](http://n-dimensional.de/blog/2014/07/04/led-configuration-with-openwrt/)
-does.
+setup does.
 
 `send-echo-request` has been designed and developed on and for use on
 GNU/Linux (Fedora) and uClibc/Linux (OpenWRT). On other systems, YMMV.
@@ -24,8 +25,8 @@ Running `send-echo-request` should be easy enough:
 (at your option) any later version. Read the LICENSE file for details.
 
 
-Building and installing, generic edition
-----------------------------------------
+Building and installing, generic Linux edition
+----------------------------------------------
 
 This requires GNU `make` and `gcc` and possible a few more things I
 forgot to list here.
@@ -50,8 +51,8 @@ and `bindir`, and then run
 	make uninstall
 
 
-Building and installing, OpenWRT hack edition
----------------------------------------------
+Building and installing, embedded/OpenWRT hack edition
+------------------------------------------------------
 
 After
 [setting up an OpenWRT buildroot](http://wiki.openwrt.org/doc/howto/build)
@@ -65,8 +66,8 @@ and building at least the toolchain part of it, you can build
 The stripping part reduces the file size from ~20K to ~8K. (Yes, the
 strip utility should really be from the OpenWRT buildroot toolchain.)
 
-After copying `send-echo-request` over to the OpenWRT host, it should
-be available for use.
+After copying the `send-echo-request` executable over to the OpenWRT
+host, it should be available for use:
 
 	scp send-echo-request openwrt_host:/bin/
 
