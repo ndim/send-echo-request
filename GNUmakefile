@@ -22,9 +22,11 @@ all: $(EXE) $(EXE).lss $(EXE).sym
 CLEANFILES += $(EXE)
 $(EXE) : send-echo-request.o
 
+CLEANFILES += $(EXE).lss
 $(EXE).lss: $(EXE)
 	$(OBJDUMP) -h -S $< > $@
 
+CLEANFILES += $(EXE).sym
 $(EXE).sym: $(EXE)
 	$(NM) -n $(EXE) > $@
 
