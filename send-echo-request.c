@@ -497,8 +497,6 @@ int main(int argc, char *argv[])
     int ping_errors = 0;
     for (int i=0; i<task_cnt; ++i) {
       switch (tasks[i].sas.ss_family) {
-      case AF_UNSPEC:
-	return 0;
       case AF_INET:
 	if (send_ping4((struct sockaddr_in *) &tasks[i].sas,
 		       sequenceno, tasks[i].addr_str)) {
