@@ -1,10 +1,15 @@
-prefix = /usr
+prefix     = /usr
 execprefix = $(prefix)
-bindir = $(execprefix)/bin
+bindir     = $(execprefix)/bin
 
 INSTALL = install
-NM = nm
-OBJDUMP = objdump
+
+hostprefix = 
+
+CC      = $(hostprefix)gcc
+NM      = $(hostprefix)nm
+OBJDUMP = $(hostprefix)objdump
+STRIP   = $(hostprefix)strip
 
 CLEANFILES =
 
@@ -14,21 +19,26 @@ CLEANFILES += git-version.h
 DUMMY2 := $(shell ./update-usage-msg.sh)
 CLEANFILES += usage-msg.h
 
-EXE = send-echo-request
+BASE = send-echo-request
 
 .PHONY: all
-all: $(EXE) $(EXE).lss $(EXE).sym
+all: $(BASE).exe $(BASE).stripped $(BASE).lss $(BASE).sym
 
-CLEANFILES += $(EXE)
-$(EXE) : send-echo-request.o
+CLEANFILES += $(BASE).exe
+$(BASE).exe: send-echo-request.o
+	$(CC) $(LDFLAGS) $(LIBS) $^ -o $@
 
-CLEANFILES += $(EXE).lss
-$(EXE).lss: $(EXE)
+CLEANFILES += $(BASE).lss
+$(BASE).lss: $(BASE).exe
 	$(OBJDUMP) -h -S $< > $@
 
-CLEANFILES += $(EXE).sym
-$(EXE).sym: $(EXE)
-	$(NM) -n $(EXE) > $@
+CLEANFILES += $(BASE).sym
+$(BASE).sym: $(BASE).exe
+	$(NM) -n $< > $@
+
+CLEANFILES += $(BASE).stripped
+$(BASE).stripped: $(BASE).exe
+	$(STRIP) -o $@ $<
 
 CLEANFILES += send-echo-request.o
 
@@ -54,9 +64,9 @@ clean:
 
 .PHONY: install
 install: all
-	$(INSTALL) -c  -m 0755 -d     $(DESTDIR)$(bindir)
-	$(INSTALL) -cp -m 0755 $(EXE) $(DESTDIR)$(bindir)/send-echo-request
+	$(INSTALL) -c  -m 0755 -d          $(DESTDIR)$(bindir)
+	$(INSTALL) -cp -m 0755 $(BASE).exe $(DESTDIR)$(bindir)/$(BASE)
 
 .PHONY: uninstall
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/send-echo-request
+	rm -f $(DESTDIR)$(bindir)/$(BASE)

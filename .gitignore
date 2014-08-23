@@ -9,5 +9,7 @@
 *.o
 *.s
 /send-echo-request
+/send-echo-request.exe
+/send-echo-request.stripped
 /send-echo-request.lss
 /send-echo-request.sym
