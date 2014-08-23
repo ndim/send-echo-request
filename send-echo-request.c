@@ -377,9 +377,53 @@ typedef struct {
 } task_T;
 
 
+static
+void main_loop(const task_T *const tasks, const size_t task_cnt)
+{
+  /* endless main loop unless !do_loop */
+  for (uint16_t sequenceno=1; ; ++sequenceno) {
+    normalf("sequenceno %u", sequenceno);
+
+    size_t ping_errors = 0;
+    for (size_t i=0; i<task_cnt; ++i) {
+      switch (tasks[i].sas.ss_family) {
+      case AF_INET:
+	if (send_ping4((struct sockaddr_in *) &tasks[i].sas,
+		       sequenceno, tasks[i].addr_str)) {
+	  ++ping_errors;
+	}
+	break;
+      case AF_INET6:
+	if (send_ping6((struct sockaddr_in6 *) &tasks[i].sas,
+		       sequenceno, tasks[i].addr_str)) {
+	  ++ping_errors;
+	}
+	break;
+      default:
+	error_exitf("Invalid ss_family %u", tasks[i].sas.ss_family);
+      }
+
+      struct timespec rem_ts;
+      nanosleep(&tasks[i].delay, &rem_ts);
+      /* ignore rem_ts value */
+    }
+    if (ping_errors) {
+      normalf("ping_errors %zu/%zu", ping_errors, task_cnt);
+    }
+
+    if (!do_loop) {
+      if (ping_errors) {
+	exit(EXIT_FAILURE);
+      }
+      break;
+    }
+  }
+}
+
+
 int main(int argc, char *argv[])
 {
-  int     task_cnt = 0;
+  size_t  task_cnt = 0;
   task_T *tasks    = NULL;
 
 
@@ -489,45 +533,7 @@ int main(int argc, char *argv[])
 
 
   /*** main loop ***/
-
-  /* endless main loop unless !do_loop */
-  for (uint16_t sequenceno=1; ; ++sequenceno) {
-    normalf("sequenceno %u", sequenceno);
-
-    int ping_errors = 0;
-    for (int i=0; i<task_cnt; ++i) {
-      switch (tasks[i].sas.ss_family) {
-      case AF_INET:
-	if (send_ping4((struct sockaddr_in *) &tasks[i].sas,
-		       sequenceno, tasks[i].addr_str)) {
-	  ++ping_errors;
-	}
-	break;
-      case AF_INET6:
-	if (send_ping6((struct sockaddr_in6 *) &tasks[i].sas,
-		       sequenceno, tasks[i].addr_str)) {
-	  ++ping_errors;
-	}
-	break;
-      default:
-	error_exitf("Invalid ss_family %u", tasks[i].sas.ss_family);
-      }
-
-      struct timespec rem_ts;
-      nanosleep(&tasks[i].delay, &rem_ts);
-      /* ignore rem_ts value */
-    }
-    if (ping_errors) {
-      normalf("ping_errors %u/%u", ping_errors, task_cnt);
-    }
-
-    if (!do_loop) {
-      if (ping_errors) {
-	return 1;
-      }
-      break;
-    }
-  }
+  main_loop(tasks, task_cnt);
 
   return 0;
 }
