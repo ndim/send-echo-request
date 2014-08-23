@@ -261,6 +261,7 @@ int send_ping4(struct sockaddr_in *dest_addr,
   /* compose ICMP packet */
   struct icmphdr hdr;
   memset(&hdr, 0, sizeof(hdr));
+
   hdr.type             = ICMP_ECHO;         /* ICMP echo request */
   hdr.code             = 0;
   hdr.checksum         = 0;  /* required for actual checksum calculation */
@@ -330,6 +331,7 @@ int send_ping6(struct sockaddr_in6 *dest_addr,
   /* compose ICMPv6 packet */
   struct icmp6_hdr hdr;
   memset(&hdr, 0, sizeof(hdr));
+
   hdr.icmp6_type                      = ICMP6_ECHO_REQUEST;
   hdr.icmp6_code                      = 0;
   hdr.icmp6_dataun.icmp6_un_data16[0] = htons(IDENTIFIER); /* identifier */
