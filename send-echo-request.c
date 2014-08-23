@@ -142,12 +142,12 @@ void print_version()
 
 
 static
-void messagef_i(const verbosity_T msg_verb, const char *format, ...)
+void messagef_i(const verbosity_T msg_verb, const char *const format, ...)
   __attribute__(( unused ))
   __attribute__(( format(printf, 2, 3) ));
 
 static
-void messagef_i(const verbosity_T msg_verb, const char *format, ...)
+void messagef_i(const verbosity_T msg_verb, const char *const format, ...)
 {
   va_list ap;
   if (verbosity >= msg_verb) {
@@ -163,7 +163,7 @@ void messagef_i(const verbosity_T msg_verb, const char *format, ...)
 			       PROG ": " MSG ": ")
 
 static
-void quietfe_i(const size_t msglen, const char *msg)
+void quietfe_i(const size_t msglen, const char *const msg)
 {
   if (verbosity >= VERB_QUIET) {
     const int local_errno = errno; /* read global var errno */
@@ -184,12 +184,12 @@ void quietfe_i(const size_t msglen, const char *msg)
 				     PROG ": " MSG "\n")
 
 static
-void error_exit_i(const size_t msglen, const char *msg)
+void error_exit_i(const size_t msglen, const char *const msg)
   __attribute__((noreturn));
 
 /* this should even work when realloc or malloc have failed */
 static
-void error_exit_i(const size_t msglen, const char *msg)
+void error_exit_i(const size_t msglen, const char *const msg)
 {
   (void) write(STDERR_FILENO, msg, msglen);
   exit(EXIT_FAILURE);
@@ -209,7 +209,7 @@ void error_exit_i(const size_t msglen, const char *msg)
 
 
 static
-uint16_t icmp_checksum(const uint16_t *data, const size_t byte_sz)
+uint16_t icmp_checksum(const uint16_t *const data, const size_t byte_sz)
 {
   if (0 != (byte_sz & 1)) {
     error_exitf("icmp_checksum: number of bytes %zu must be even",
@@ -236,7 +236,7 @@ uint16_t icmp_checksum(const uint16_t *data, const size_t byte_sz)
 
 static
 int send_ping4(struct sockaddr_in *dest_addr,
-	       const uint16_t sequenceno, const char *dest_str)
+	       const uint16_t sequenceno, const char *const dest_str)
 {
   verbosef("send_ping4 %s", dest_str);
   veryverbosef("%-13s %d", "sin_family", dest_addr->sin_family);
@@ -288,7 +288,7 @@ int send_ping4(struct sockaddr_in *dest_addr,
 
 static
 int send_ping6(struct sockaddr_in6 *dest_addr,
-	       const uint16_t sequenceno, const char *dest_str)
+	       const uint16_t sequenceno, const char *const dest_str)
 {
   verbosef("send_ping6 %s", dest_str);
   veryverbosef("%-13s %d", "sin6_family", dest_addr->sin6_family);
@@ -440,7 +440,7 @@ int main(int argc, char *argv[])
 
 
   for (int i=1; i<argc; ++i) {
-    const char *arg = argv[i];
+    const char *const arg = argv[i];
 
     union {
       struct sockaddr_in  sin;
