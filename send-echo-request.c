@@ -381,7 +381,7 @@ static
 void main_loop(const task_T *const tasks, const size_t task_cnt)
 {
   /* endless main loop unless !do_loop */
-  for (uint16_t sequenceno=1; ; ++sequenceno) {
+  for (uint16_t sequenceno=0; ; ++sequenceno) {
     normalf("sequenceno %u", sequenceno);
 
     size_t ping_errors = 0;
