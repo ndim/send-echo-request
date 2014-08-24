@@ -35,20 +35,21 @@ Building `send-echo-request` should be easy:
 
     $ make
 
-This builds both `send-echo-request.exe` and
-`send-echo-request.stripped` versions of the executable. You can
-choose to `ln -s` one of them to `send-echo-request` for convenience:
+This builds both `host/send-echo-request.exe` and
+`host/send-echo-request.stripped` versions of the executable to be run
+on the build host. You can choose to `ln -s` one of them to
+`send-echo-request` for convenience:
 
-    $ ln -s send-echo-request.exe send-echo-request
+    $ ln -s host/send-echo-request.exe send-echo-request
 
-If you want to run `send-echo-request` as a non-root user, you need to
-give the executable the required set of capabilities:
+If you want to run `send-echo-request` as a non-root user, the root
+user must give the executable the required set of capabilities:
 
-    # setcap "cap_net_raw=ep" send-echo-request{.exe,.stripped}
+    # setcap "cap_net_raw=ep" host/send-echo-request.exe
 
 The complete `cap_net_raw=ep cap_net_admin=ep` capability set often
 used for `iputils`' `ping` and `ping6` executables appears not to be
-required for `send-echo-request` more limited feature set.
+required for the more limited feature set of `send-echo-request`.
 
 For installation using GNU `make`, you can optionally define `DESTDIR`
 and `bindir`, and then run
@@ -62,26 +63,30 @@ Building and installing, embedded/OpenWRT hack edition
 
 After
 [setting up an OpenWRT buildroot](http://wiki.openwrt.org/doc/howto/build)
-and building at least the toolchain part of it, you can build
-`send-echo-request´ like
+and building at least the toolchain part of it, you can build a
+cross-compile version of `send-echo-request` like so:
 
-    make clean
-    make STAGING_DIR="\$(HOME)/src/openwrt-build/12.09/staging_dir" hostprefix="\$(STAGING_DIR)/toolchain-i386_gcc-4.6-linaro_uClibc-0.9.33.2/bin/i486-openwrt-linux-uclibc-"
+    $ make STAGING_DIR="\$(HOME)/src/openwrt-build/12.09/staging_dir" crossprefix="\$(STAGING_DIR)/toolchain-i386_gcc-4.6-linaro_uClibc-0.9.33.2/bin/i486-openwrt-linux-uclibc-"
 
-Note that stripping the symbols reduces the file size from ~20K to
-~8K, so the `send-echo-request.stripped` is a better candidate for
-installing to the OpenWRT system:
+This builds both `cross/send-echo-request.exe` and
+`cross/send-echo-request.stripped` versions of the executable to be
+run on the embedded OpenWRT system.
 
--rwxrwxr-x. 1 USER USER 21838 Aug 23 21:57 send-echo-request.exe
--rwxrwxr-x. 1 USER USER  8432 Aug 23 21:57 send-echo-request.stripped
+Stripping the symbols reduces the file size from ~20K to ~8K, so the
+`cross/send-echo-request.stripped` executable is probably the better
+candidate for installing to the OpenWRT system:
 
-After copying the `send-echo-request.stripped` executable over to the
-OpenWRT host, it should be available for use:
+    -rwxrwxr-x. 1 USER USER 21838 Aug 23 21:57 send-echo-request.exe
+    -rwxrwxr-x. 1 USER USER  8432 Aug 23 21:57 send-echo-request.stripped
 
-	scp send-echo-request.exe openwrt_host:/bin/send-echo-request
+After copying the `cross/send-echo-request.stripped` executable over
+to the OpenWRT host, it should be available for use:
 
-(Yes, this is a hack: No IPKG software package. Using
-non-crosscompile-strip tool. However, it works for me. YMMV.)
+	$ scp cross/send-echo-request.stripped openwrt_host:/bin/send-echo-request
+
+(Yes, this a hack: No IPKG software package. No proper build process
+for the OpenWRT buildchain and `send-echo-request`. However, it works
+for me. YMMV.)
 
 
 References

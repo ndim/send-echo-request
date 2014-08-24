@@ -13,3 +13,7 @@
 /send-echo-request.stripped
 /send-echo-request.lss
 /send-echo-request.sym
+
+# Directories with compile results
+/cross/
+/host/

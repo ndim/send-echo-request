@@ -4,12 +4,17 @@ bindir     = $(execprefix)/bin
 
 INSTALL = install
 
-hostprefix = 
+crossprefix =
 
-CC      = $(hostprefix)gcc
-NM      = $(hostprefix)nm
-OBJDUMP = $(hostprefix)objdump
-STRIP   = $(hostprefix)strip
+crossCC      = $(crossprefix)gcc
+crossNM      = $(crossprefix)nm
+crossOBJDUMP = $(crossprefix)objdump
+crossSTRIP   = $(crossprefix)strip
+
+CC      = gcc
+NM      = nm
+OBJDUMP = objdump
+STRIP   = strip
 
 CLEANFILES =
 
@@ -20,52 +25,26 @@ DUMMY2 := $(shell ./update-usage-msg.sh)
 CLEANFILES += usage-msg.h
 
 BASE = send-echo-request
+export BASE
 
 .PHONY: all
-all: $(BASE).exe $(BASE).stripped $(BASE).lss $(BASE).sym
-
-CLEANFILES += $(BASE).exe
-$(BASE).exe: send-echo-request.o
-	$(CC) $(LDFLAGS) $(LIBS) $^ -o $@
-
-CLEANFILES += $(BASE).lss
-$(BASE).lss: $(BASE).exe
-	$(OBJDUMP) -h -S $< > $@
-
-CLEANFILES += $(BASE).sym
-$(BASE).sym: $(BASE).exe
-	$(NM) -n $< > $@
-
-CLEANFILES += $(BASE).stripped
-$(BASE).stripped: $(BASE).exe
-	$(STRIP) -o $@ $<
-
-CLEANFILES += send-echo-request.o
-
-send-echo-request.o : CFLAGS += -std=gnu99
-send-echo-request.o : CFLAGS += -Wall
-send-echo-request.o : CFLAGS += -Wextra
-send-echo-request.o : CFLAGS += -Werror
-send-echo-request.o : CFLAGS += -pedantic
-
-send-echo-request.o : CFLAGS += -g
-
-# -O optimizes strlen() calls on string literals into constant numbers
-send-echo-request.o : CFLAGS += -Os
-
-send-echo-request.o : send-echo-request.c git-version.h usage-msg.h
-
-# Force recompile when we change the compile flags in GNUmakefile
-send-echo-request.o : GNUmakefile
+all:
+	mkdir -p host
+	$(MAKE) -f rules.mk outdir=host  CC=$(CC)      NM=$(NM)      OBJDUMP=$(OBJDUMP)      STRIP=$(STRIP)
+ifneq ($(crossprefix),)
+	mkdir -p cross
+	$(MAKE) -f rules.mk outdir=cross CC=$(crossCC) NM=$(crossNM) OBJDUMP=$(crossOBJDUMP) STRIP=$(crossSTRIP)
+endif
 
 .PHONY: clean
 clean:
 	rm -f $(CLEANFILES)
+	rm -rf cross host
 
 .PHONY: install
 install: all
-	$(INSTALL) -c  -m 0755 -d          $(DESTDIR)$(bindir)
-	$(INSTALL) -cp -m 0755 $(BASE).exe $(DESTDIR)$(bindir)/$(BASE)
+	$(INSTALL) -c  -m 0755 -d               $(DESTDIR)$(bindir)
+	$(INSTALL) -cp -m 0755 host/$(BASE).exe $(DESTDIR)$(bindir)/$(BASE)
 
 .PHONY: uninstall
 uninstall:
