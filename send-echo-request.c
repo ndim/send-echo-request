@@ -1,6 +1,6 @@
 /***********************************************************************
  * send-echo-request - send ICMP(v6) echo request without waiting for answers
- * Copyright (C) {2014} Hans Ulrich Niedermann
+ * Copyright (C) 2014 Hans Ulrich Niedermann
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
