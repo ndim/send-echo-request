@@ -1,3 +1,7 @@
+# Internal build rules for building send-echo-request.
+# Requires outdir, CC, NM, OBJDUMP, STRIP to be set appropriately.
+# CFLAGS & Co. are exported by the calling makefile implicitly.
+
 outdir = .
 
 TARGETS =

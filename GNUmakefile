@@ -1,3 +1,11 @@
+# Usage: make [var=value]...
+# Compile host binaries and (if crossprefix set) cross-compile as well.
+#
+# Some variables with example values:
+#   crossprefix=i486-openwrt-linux-uclibc-
+#   bindir=/usr/sbin
+#   DESTDIR=$PWD/_installroot
+
 prefix     = /usr
 execprefix = $(prefix)
 bindir     = $(execprefix)/bin

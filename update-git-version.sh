@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# Update git-version.sh, but only if it has actually changed so that
+# make does not rebuild everything every time.
 
 set -e
 cd "$(dirname "$0")"

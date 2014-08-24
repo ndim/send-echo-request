@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# Update usage-msg.h from send-echo-request.c comment if it has
+# changed, so that make only rebuilds on actual changes.
 
 set -e
 cd "$(dirname "$0")"
