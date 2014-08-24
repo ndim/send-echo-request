@@ -3,8 +3,16 @@
 #
 # Some variables with example values:
 #   crossprefix=i486-openwrt-linux-uclibc-
+#   crossbindir=/bin
+#   crosshost=wrt
 #   bindir=/usr/sbin
 #   DESTDIR=$PWD/_installroot
+#
+# Some interesting targets:
+#   all (default)
+#   clean
+#   install
+#   cross-install
 
 prefix     = /usr
 execprefix = $(prefix)
@@ -12,6 +20,8 @@ bindir     = $(execprefix)/bin
 
 INSTALL = install
 
+crossbindir = /bin
+crosshost = need-to-set-crosshost-first
 crossprefix =
 
 crossCC      = $(crossprefix)gcc
@@ -57,3 +67,13 @@ install: all
 .PHONY: uninstall
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(BASE)
+
+# Remove the target file first to work around OpenWRT "text file busy" error.
+.PHONY: cross-install
+cross-install: all
+	ssh $(crosshost) rm -f $(crossbindir)/$(BASE)
+	scp cross/$(BASE).stripped $(crosshost):$(crossbindir)/$(BASE)
+
+.PHONY: cross-uninstall
+cross-uninstall:
+	ssh $(crosshost) rm -f $(crossbindir)/$(BASE)
