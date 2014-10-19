@@ -1,16 +1,17 @@
 send-echo-request
 =================
 
-`send-echo-request` sends one ICMP (IPv4) or ICMPv6 echo request each
-to a list of addresses without waiting for the echo reply packets. A
-packet is sent every 0.5 seconds. Optionally, sending the packets is
+`send-echo-request` sends one ICMP (IPv4) or ICMPv6 (IPv6) echo request
+each to a list of addresses without waiting for the echo reply packets.
+A packet is sent every 0.5 seconds. Optionally, sending the packets is
 repeated in an infinite loop.
 
 As `send-echo-request` does not wait for or evaluate any echo reply
 packets, processing the received reply packets must be done in another
-place, e.g. in `iptables` like my
+place if necessary. One such example is my
 [someone else is using the internet LED (YUP LED)](http://n-dimensional.de/blog/2014/07/04/led-configuration-with-openwrt/)
-setup does.
+setup which uses `iptables` to have the kernel trigger a LED on arrival
+of certain packets.
 
 `send-echo-request` has been designed and developed on and for use on
 GNU/Linux (Fedora) and uClibc/Linux (OpenWRT). On other systems, YMMV.
@@ -28,7 +29,7 @@ Running `send-echo-request` should be easy enough:
 Building and installing, generic Linux edition
 ----------------------------------------------
 
-This requires GNU `make` and `gcc` and possible a few more things I
+This requires GNU `make` and `gcc` and possibly a few more things I
 forgot to list here.
 
 Building `send-echo-request` should be easy:
@@ -48,14 +49,14 @@ user must give the executable the required set of capabilities:
     # setcap "cap_net_raw=ep" host/send-echo-request.exe
 
 The complete `cap_net_raw=ep cap_net_admin=ep` capability set often
-used for `iputils`' `ping` and `ping6` executables appears not to be
+used for the `iputils`' `ping` and `ping6` executables appears not to be
 required for the more limited feature set of `send-echo-request`.
 
 For installation using GNU `make`, you can optionally define `DESTDIR`
 and `bindir`, and then run
 
     make install
-	make uninstall
+    make uninstall
 
 
 Building and installing, embedded/OpenWRT hack edition
@@ -76,8 +77,8 @@ Stripping the symbols reduces the file size from ~20K to ~8K, so the
 `cross/send-echo-request.stripped` executable is probably the better
 candidate for installing to the OpenWRT system:
 
-    -rwxrwxr-x. 1 USER USER 21838 Aug 23 21:57 send-echo-request.exe
-    -rwxrwxr-x. 1 USER USER  8432 Aug 23 21:57 send-echo-request.stripped
+    -rwxrwxr-x. 1 USER GROUP 21838 Aug 23 21:57 send-echo-request.exe
+    -rwxrwxr-x. 1 USER GROUP  8432 Aug 23 21:57 send-echo-request.stripped
 
 After copying the `cross/send-echo-request.stripped` executable over
 to the OpenWRT host, it should be available for use:
