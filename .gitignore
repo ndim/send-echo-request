@@ -17,3 +17,5 @@
 # Directories with compile results
 /cross/
 /host/
+/cross-*build/
+/host-build/

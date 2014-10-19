@@ -45,24 +45,27 @@ CLEANFILES += usage-msg.h
 BASE = send-echo-request
 export BASE
 
+crossbuild := cross-$(notdir $(crossprefix))build
+hostbuild  := host-build
+
 .PHONY: all
 all:
-	mkdir -p host
-	$(MAKE) -f rules.mk outdir=host  CC=$(CC)      NM=$(NM)      OBJDUMP=$(OBJDUMP)      STRIP=$(STRIP)
+	mkdir -p $(hostbuild)
+	$(MAKE) -f rules.mk outdir=$(hostbuild)  CC=$(CC)      NM=$(NM)      OBJDUMP=$(OBJDUMP)      STRIP=$(STRIP)
 ifneq ($(crossprefix),)
-	mkdir -p cross
-	$(MAKE) -f rules.mk outdir=cross CC=$(crossCC) NM=$(crossNM) OBJDUMP=$(crossOBJDUMP) STRIP=$(crossSTRIP)
+	mkdir -p $(crossbuild)
+	$(MAKE) -f rules.mk outdir=$(crossbuild) CC=$(crossCC) NM=$(crossNM) OBJDUMP=$(crossOBJDUMP) STRIP=$(crossSTRIP)
 endif
 
 .PHONY: clean
 clean:
 	rm -f $(CLEANFILES)
-	rm -rf cross host
+	rm -rf $(crossbuild) $(hostbuild)
 
 .PHONY: install
 install: all
-	$(INSTALL) -c  -m 0755 -d               $(DESTDIR)$(bindir)
-	$(INSTALL) -cp -m 0755 host/$(BASE).exe $(DESTDIR)$(bindir)/$(BASE)
+	$(INSTALL) -c  -m 0755 -d                       $(DESTDIR)$(bindir)
+	$(INSTALL) -cp -m 0755 $(hostbuild)/$(BASE).exe $(DESTDIR)$(bindir)/$(BASE)
 
 .PHONY: uninstall
 uninstall:
@@ -72,7 +75,7 @@ uninstall:
 .PHONY: cross-install
 cross-install: all
 	ssh $(crosshost) rm -f $(crossbindir)/$(BASE)
-	scp cross/$(BASE).stripped $(crosshost):$(crossbindir)/$(BASE)
+	scp $(crossbuild)/$(BASE).stripped $(crosshost):$(crossbindir)/$(BASE)
 
 .PHONY: cross-uninstall
 cross-uninstall:
