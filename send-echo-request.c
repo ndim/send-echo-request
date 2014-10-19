@@ -92,7 +92,7 @@ typedef enum {
 } verbosity_T;
 
 
-/* These can be set via cmdline options */
+/* These globals can be set via cmdline options */
 static bool dry_run = false;
 static bool do_loop = false;
 static verbosity_T verbosity = VERB_NORMAL;
@@ -268,7 +268,7 @@ int send_ping4(struct sockaddr_in *dest_addr,
   hdr.un.echo.id       = htons(IDENTIFIER); /* identifier */
   hdr.un.echo.sequence = htons(sequenceno); /* sequence no */
 
-  /* Fill out the ICMP checksum */
+  /* Fill in the ICMP checksum */
   hdr.checksum         = icmp_checksum((uint16_t *)&hdr, sizeof(hdr));
 
   /* send the echo request packet */
@@ -337,7 +337,7 @@ int send_ping6(struct sockaddr_in6 *dest_addr,
   hdr.icmp6_dataun.icmp6_un_data16[0] = htons(IDENTIFIER); /* identifier */
   hdr.icmp6_dataun.icmp6_un_data16[1] = htons(sequenceno); /* sequence no */
 
-  /* Have the system fill out hdr.icmp6_cksum for us */
+  /* Have the system fill in hdr.icmp6_cksum for us */
   int cksum_ofs = offsetof(struct icmp6_hdr, icmp6_cksum);
   const socklen_t cksum_ofs_sz = sizeof(cksum_ofs);
   const int sso_ret = setsockopt(sock, SOL_RAW, IPV6_CHECKSUM,
@@ -453,8 +453,8 @@ int main(int argc, char *argv[])
     /* These blocks should either
      *   exit          to exit the program
      *   return        to exit the program
-     *   <do nothing>  to clean up the adding of a task
-     *   continue      having not added a task
+     *   <do nothing>  when having added a task (causing appropriate handling)
+     *   continue      when not having added a task
      */
     if (0 == strcmp("--help", arg)) {
       print_usage();
