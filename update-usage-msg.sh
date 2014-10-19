@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Update usage-msg.h from send-echo-request.c comment if it has
+# Update usage-msg.h from send-echo-request.c comment iff it has
 # changed, so that make only rebuilds on actual changes.
 
 set -e
