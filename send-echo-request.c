@@ -431,14 +431,16 @@ int main(int argc, char *argv[])
 
   /*** parse command line ***/
 
-#define enlarge_array(addrstr)				     \
-  tasks = realloc(tasks, sizeof(tasks[0]) * (task_cnt + 1)); \
-  if (!tasks) {						     \
-    quietfe("realloc");					     \
-    exit(EXIT_FAILURE);					     \
-  }							     \
-  memset(&tasks[task_cnt], 0, sizeof(tasks[task_cnt]));	     \
-  tasks[task_cnt].addr_str = addrstr;
+#define enlarge_array(addrstr)					\
+  do {								\
+    tasks = realloc(tasks, sizeof(tasks[0]) * (task_cnt + 1));	\
+    if (!tasks) {						\
+      quietfe("realloc");					\
+      exit(EXIT_FAILURE);					\
+    }								\
+    memset(&tasks[task_cnt], 0, sizeof(tasks[task_cnt]));	\
+    tasks[task_cnt].addr_str = addrstr;				\
+  } while (0)
 
 
   for (int i=1; i<argc; ++i) {
