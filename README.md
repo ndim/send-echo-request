@@ -1,6 +1,8 @@
 send-echo-request
 =================
 
+[![Build Status](https://travis-ci.org/ndim/send-echo-request.svg?branch=master)](https://travis-ci.org/ndim/send-echo-request)
+
 `send-echo-request` sends one ICMP (IPv4) or ICMPv6 (IPv6) echo request
 each to a list of addresses without waiting for the echo reply packets.
 A packet is sent every 0.5 seconds. Optionally, sending the packets is
