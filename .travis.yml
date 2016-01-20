@@ -1,0 +1,8 @@
+language: C
+
+script:
+  - make
+  - make install DESTDIR=$PWD/_i
+  - test -x host-build/send-echo-request.exe
+  - ./host-build/send-echo-request.exe --help
+  - ./host-build/send-echo-request.exe --version
