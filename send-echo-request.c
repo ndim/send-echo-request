@@ -79,6 +79,14 @@
 
 
 /***********************************************************************
+ * Compiler infrastructure
+ ***********************************************************************/
+
+
+#define IGNORE_RESULT(statement) while (0) { if (statement) {} }
+
+
+/***********************************************************************
  * Global settings, can be changed by command line options
  ***********************************************************************/
 
@@ -106,7 +114,7 @@ static verbosity_T verbosity = VERB_NORMAL;
 static
 void print_usage()
 {
-  (void) write(STDOUT_FILENO, USAGE_MSG, strlen(USAGE_MSG));
+  IGNORE_RESULT(write(STDOUT_FILENO, USAGE_MSG, strlen(USAGE_MSG)));
 }
 
 
@@ -120,7 +128,7 @@ void print_usage()
 static
 void print_version()
 {
-  (void) write(STDOUT_FILENO, VERSION_MSG, strlen(VERSION_MSG));
+  IGNORE_RESULT(write(STDOUT_FILENO, VERSION_MSG, strlen(VERSION_MSG)));
 }
 
 
@@ -168,9 +176,9 @@ void quietfe_i(const size_t msglen, const char *const msg)
   if (verbosity >= VERB_QUIET) {
     const int local_errno = errno; /* read global var errno */
     const char *errmsg = strerror(local_errno);
-    (void) write(STDERR_FILENO, msg, msglen);
-    (void) write(STDERR_FILENO, errmsg, strlen(errmsg));
-    (void) write(STDERR_FILENO, "\n", 1);
+    IGNORE_RESULT(write(STDERR_FILENO, msg, msglen));
+    IGNORE_RESULT(write(STDERR_FILENO, errmsg, strlen(errmsg)));
+    IGNORE_RESULT(write(STDERR_FILENO, "\n", 1));
   }
 }
 
@@ -191,7 +199,7 @@ void error_exit_i(const size_t msglen, const char *const msg)
 static
 void error_exit_i(const size_t msglen, const char *const msg)
 {
-  (void) write(STDERR_FILENO, msg, msglen);
+  IGNORE_RESULT(write(STDERR_FILENO, msg, msglen));
   exit(EXIT_FAILURE);
 }
 
