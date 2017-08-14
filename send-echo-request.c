@@ -118,9 +118,9 @@ void print_usage()
 }
 
 
-#define VERSION_MSG ""				  \
-  PROG " " GIT_VERSION_STR "\n"			  \
-  "Copyright (C) 2014 Hans Ulrich Niedermann\n"	  \
+#define VERSION_MSG ""                            \
+  PROG " " GIT_VERSION_STR "\n"                   \
+  "Copyright (C) 2014 Hans Ulrich Niedermann\n"   \
   "License GPLv2+: GNU GPL version 2 or later\n"  \
   ""
 
@@ -137,15 +137,15 @@ void print_version()
  ***********************************************************************/
 
 
-#define normalf(fmt, ...)					\
+#define normalf(fmt, ...)                                       \
   messagef_i(VERB_NORMAL,  "* " fmt "\n", ##__VA_ARGS__)
 
 
-#define verbosef(fmt, ...)					\
+#define verbosef(fmt, ...)                                      \
   messagef_i(VERB_VERBOSE, "  * " fmt "\n", ##__VA_ARGS__)
 
 
-#define veryverbosef(fmt, ...)					\
+#define veryverbosef(fmt, ...)                                  \
   messagef_i(VERB_VERY,    "    * " fmt "\n", ##__VA_ARGS__)
 
 
@@ -168,7 +168,7 @@ void messagef_i(const verbosity_T msg_verb, const char *const format, ...)
 
 
 #define quietfe(MSG) quietfe_i(strlen(PROG ": " MSG ": "), \
-			       PROG ": " MSG ": ")
+                               PROG ": " MSG ": ")
 
 static
 void quietfe_i(const size_t msglen, const char *const msg)
@@ -189,7 +189,7 @@ void quietfe_i(const size_t msglen, const char *const msg)
 
 
 #define error_exit(MSG) error_exit_i(strlen(PROG ": " MSG "\n"), \
-				     PROG ": " MSG "\n")
+                                     PROG ": " MSG "\n")
 
 static
 void error_exit_i(const size_t msglen, const char *const msg)
@@ -204,10 +204,10 @@ void error_exit_i(const size_t msglen, const char *const msg)
 }
 
 
-#define error_exitf(fmt, ...)					\
-  do {								\
-    fprintf(stderr, PROG ": " fmt "\n", ##__VA_ARGS__);		\
-    exit(EXIT_FAILURE);						\
+#define error_exitf(fmt, ...)                                   \
+  do {                                                          \
+    fprintf(stderr, PROG ": " fmt "\n", ##__VA_ARGS__);         \
+    exit(EXIT_FAILURE);                                         \
   } while (0)
 
 
@@ -221,7 +221,7 @@ uint16_t icmp_checksum(const uint16_t *const data, const size_t byte_sz)
 {
   if (0 != (byte_sz & 1)) {
     error_exitf("icmp_checksum: number of bytes %zu must be even",
-		byte_sz);
+                byte_sz);
   }
 
   uint32_t accu = 0;
@@ -244,16 +244,16 @@ uint16_t icmp_checksum(const uint16_t *const data, const size_t byte_sz)
 
 static
 int send_ping4(struct sockaddr_in *dest_addr,
-	       const uint16_t sequenceno, const char *const dest_str)
+               const uint16_t sequenceno, const char *const dest_str)
 {
   verbosef("send_ping4 %s", dest_str);
   veryverbosef("%-13s %d", "sin_family", dest_addr->sin_family);
   veryverbosef("%-13s %u.%u.%u.%u", "sin_addr",
-	       (ntohl(dest_addr->sin_addr.s_addr) & 0xff000000) >> 24,
-	       (ntohl(dest_addr->sin_addr.s_addr) & 0x00ff0000) >> 16,
-	       (ntohl(dest_addr->sin_addr.s_addr) & 0x0000ff00) >>  8,
-	       (ntohl(dest_addr->sin_addr.s_addr) & 0x000000ff) >>  0
-	       );
+               (ntohl(dest_addr->sin_addr.s_addr) & 0xff000000) >> 24,
+               (ntohl(dest_addr->sin_addr.s_addr) & 0x00ff0000) >> 16,
+               (ntohl(dest_addr->sin_addr.s_addr) & 0x0000ff00) >>  8,
+               (ntohl(dest_addr->sin_addr.s_addr) & 0x000000ff) >>  0
+               );
   veryverbosef("%-13s %d", "sin_port", ntohs(dest_addr->sin_port));
 
   if (dry_run) {
@@ -282,9 +282,9 @@ int send_ping4(struct sockaddr_in *dest_addr,
   /* send the echo request packet */
   const ssize_t sent_bytes =
     sendto(sock,
-	   &hdr, sizeof(hdr),
-	   0 /* no MSG_* flags */,
-	   (struct sockaddr *)dest_addr, sizeof(*dest_addr));
+           &hdr, sizeof(hdr),
+           0 /* no MSG_* flags */,
+           (struct sockaddr *)dest_addr, sizeof(*dest_addr));
   if (sent_bytes != sizeof(hdr)) {
     error_exit("sendto");
   }
@@ -297,33 +297,33 @@ int send_ping4(struct sockaddr_in *dest_addr,
 
 static
 int send_ping6(struct sockaddr_in6 *dest_addr,
-	       const uint16_t sequenceno, const char *const dest_str)
+               const uint16_t sequenceno, const char *const dest_str)
 {
   verbosef("send_ping6 %s", dest_str);
   veryverbosef("%-13s %d", "sin6_family", dest_addr->sin6_family);
   veryverbosef("%-13s %d", "sin6_port", ntohs(dest_addr->sin6_port));
   veryverbosef("%-13s 0x%08x", "sin6_flowinfo", dest_addr->sin6_flowinfo);
   veryverbosef("%-13s "
-	       "%02x%02x:%02x%02x:%02x%02x:%02x%02x:"
-	       "%02x%02x:%02x%02x:%02x%02x:%02x%02x",
-	       "sin6_addr",
-	       dest_addr->sin6_addr.s6_addr[0x0],
-	       dest_addr->sin6_addr.s6_addr[0x1],
-	       dest_addr->sin6_addr.s6_addr[0x2],
-	       dest_addr->sin6_addr.s6_addr[0x3],
-	       dest_addr->sin6_addr.s6_addr[0x4],
-	       dest_addr->sin6_addr.s6_addr[0x5],
-	       dest_addr->sin6_addr.s6_addr[0x6],
-	       dest_addr->sin6_addr.s6_addr[0x7],
-	       dest_addr->sin6_addr.s6_addr[0x8],
-	       dest_addr->sin6_addr.s6_addr[0x9],
-	       dest_addr->sin6_addr.s6_addr[0xa],
-	       dest_addr->sin6_addr.s6_addr[0xb],
-	       dest_addr->sin6_addr.s6_addr[0xc],
-	       dest_addr->sin6_addr.s6_addr[0xd],
-	       dest_addr->sin6_addr.s6_addr[0xe],
-	       dest_addr->sin6_addr.s6_addr[0xf]
-	       );
+               "%02x%02x:%02x%02x:%02x%02x:%02x%02x:"
+               "%02x%02x:%02x%02x:%02x%02x:%02x%02x",
+               "sin6_addr",
+               dest_addr->sin6_addr.s6_addr[0x0],
+               dest_addr->sin6_addr.s6_addr[0x1],
+               dest_addr->sin6_addr.s6_addr[0x2],
+               dest_addr->sin6_addr.s6_addr[0x3],
+               dest_addr->sin6_addr.s6_addr[0x4],
+               dest_addr->sin6_addr.s6_addr[0x5],
+               dest_addr->sin6_addr.s6_addr[0x6],
+               dest_addr->sin6_addr.s6_addr[0x7],
+               dest_addr->sin6_addr.s6_addr[0x8],
+               dest_addr->sin6_addr.s6_addr[0x9],
+               dest_addr->sin6_addr.s6_addr[0xa],
+               dest_addr->sin6_addr.s6_addr[0xb],
+               dest_addr->sin6_addr.s6_addr[0xc],
+               dest_addr->sin6_addr.s6_addr[0xd],
+               dest_addr->sin6_addr.s6_addr[0xe],
+               dest_addr->sin6_addr.s6_addr[0xf]
+               );
   veryverbosef("%-13s 0x%08x", "sin6_scope_id", dest_addr->sin6_scope_id);
 
   if (dry_run) {
@@ -349,7 +349,7 @@ int send_ping6(struct sockaddr_in6 *dest_addr,
   int cksum_ofs = offsetof(struct icmp6_hdr, icmp6_cksum);
   const socklen_t cksum_ofs_sz = sizeof(cksum_ofs);
   const int sso_ret = setsockopt(sock, SOL_RAW, IPV6_CHECKSUM,
-				 &cksum_ofs, cksum_ofs_sz);
+                                 &cksum_ofs, cksum_ofs_sz);
   if (sso_ret < 0) {
     quietfe("setsockopt(SOL_RAW, IPV6_CHECKSUM)");
     return 1;
@@ -358,15 +358,15 @@ int send_ping6(struct sockaddr_in6 *dest_addr,
   /* send the echo request packet */
   const ssize_t sent_bytes =
     sendto(sock,
-	   &hdr, sizeof(hdr),
-	   0 /* no MSG_* flags */,
-	   (struct sockaddr *)dest_addr, sizeof(*dest_addr));
+           &hdr, sizeof(hdr),
+           0 /* no MSG_* flags */,
+           (struct sockaddr *)dest_addr, sizeof(*dest_addr));
   if (sent_bytes < 0) {
     quietfe("sendto");
     return 1;
   } else if (((size_t)sent_bytes) < sizeof(hdr)) {
     error_exitf("sendto only sent %zu bytes of %zu",
-		sent_bytes, sizeof(hdr));
+                sent_bytes, sizeof(hdr));
   }
 
   close(sock);
@@ -398,19 +398,19 @@ void main_loop(const task_T *const tasks, const size_t task_cnt)
     for (size_t i=0; i<task_cnt; ++i) {
       switch (tasks[i].sas.ss_family) {
       case AF_INET:
-	if (send_ping4((struct sockaddr_in *) &tasks[i].sas,
-		       sequenceno, tasks[i].addr_str)) {
-	  ++ping_errors;
-	}
-	break;
+        if (send_ping4((struct sockaddr_in *) &tasks[i].sas,
+                       sequenceno, tasks[i].addr_str)) {
+          ++ping_errors;
+        }
+        break;
       case AF_INET6:
-	if (send_ping6((struct sockaddr_in6 *) &tasks[i].sas,
-		       sequenceno, tasks[i].addr_str)) {
-	  ++ping_errors;
-	}
-	break;
+        if (send_ping6((struct sockaddr_in6 *) &tasks[i].sas,
+                       sequenceno, tasks[i].addr_str)) {
+          ++ping_errors;
+        }
+        break;
       default:
-	error_exitf("Invalid ss_family %u", tasks[i].sas.ss_family);
+        error_exitf("Invalid ss_family %u", tasks[i].sas.ss_family);
       }
 
       struct timespec rem_ts;
@@ -423,7 +423,7 @@ void main_loop(const task_T *const tasks, const size_t task_cnt)
 
     if (!do_loop) {
       if (ping_errors) {
-	exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
       }
       break;
     }
@@ -439,15 +439,15 @@ int main(int argc, char *argv[])
 
   /*** parse command line ***/
 
-#define enlarge_array(addrstr)					\
-  do {								\
-    tasks = realloc(tasks, sizeof(tasks[0]) * (task_cnt + 1));	\
-    if (!tasks) {						\
-      quietfe("realloc");					\
-      exit(EXIT_FAILURE);					\
-    }								\
-    memset(&tasks[task_cnt], 0, sizeof(tasks[task_cnt]));	\
-    tasks[task_cnt].addr_str = addrstr;				\
+#define enlarge_array(addrstr)                                  \
+  do {                                                          \
+    tasks = realloc(tasks, sizeof(tasks[0]) * (task_cnt + 1));  \
+    if (!tasks) {                                               \
+      quietfe("realloc");                                       \
+      exit(EXIT_FAILURE);                                       \
+    }                                                           \
+    memset(&tasks[task_cnt], 0, sizeof(tasks[task_cnt]));       \
+    tasks[task_cnt].addr_str = addrstr;                         \
   } while (0)
 
 
@@ -481,43 +481,43 @@ int main(int argc, char *argv[])
     } else if (0 == strcmp("-qq", arg)) {
       switch (verbosity) {
       case VERB_NORMAL:
-	verbosity = VERB_MUTE;
-	break;
+        verbosity = VERB_MUTE;
+        break;
       default:
-	error_exit("Illegal use of --quiet/-q");
+        error_exit("Illegal use of --quiet/-q");
       }
       continue;
     } else if ((0 == strcmp("--quiet", arg)) || (0 == strcmp("-q", arg))) {
       switch (verbosity) {
       case VERB_QUIET:
-	verbosity = VERB_MUTE;
-	break;
+        verbosity = VERB_MUTE;
+        break;
       case VERB_NORMAL:
-	verbosity = VERB_QUIET;
-	break;
+        verbosity = VERB_QUIET;
+        break;
       default:
-	error_exit("Illegal use of --quiet/-q");
+        error_exit("Illegal use of --quiet/-q");
       }
       continue;
     } else if (0 == strcmp("-vv", arg)) {
       switch (verbosity) {
       case VERB_NORMAL:
-	verbosity = VERB_VERY;
-	break;
+        verbosity = VERB_VERY;
+        break;
       default:
-	error_exit("Illegal use of --verbose/-v");
+        error_exit("Illegal use of --verbose/-v");
       }
       continue;
     } else if ((0 == strcmp("--verbose", arg)) || (0 == strcmp("-v", arg))) {
       switch (verbosity) {
       case VERB_NORMAL:
-	verbosity = VERB_VERBOSE;
-	break;
+        verbosity = VERB_VERBOSE;
+        break;
       case VERB_VERBOSE:
-	verbosity = VERB_VERY;
-	break;
+        verbosity = VERB_VERY;
+        break;
       default:
-	error_exit("Illegal use of --verbose/-v");
+        error_exit("Illegal use of --verbose/-v");
       }
       continue;
     } else if (1 == inet_pton(AF_INET6, arg, &u.sin6.sin6_addr)) {
@@ -549,3 +549,10 @@ int main(int argc, char *argv[])
 
   return 0;
 }
+
+
+/*
+ * Local Variables:
+ * indent-tabs-mode: nil
+ * End:
+ */
