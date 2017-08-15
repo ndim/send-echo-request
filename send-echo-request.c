@@ -460,7 +460,7 @@ int main(int argc, char *argv[])
     } u;
     memset(&u, 0, sizeof(u));
 
-    /* These blocks should either
+    /* These blocks must either
      *   exit          to exit the program
      *   return        to exit the program
      *   <do nothing>  when having added a task (causing appropriate handling)
