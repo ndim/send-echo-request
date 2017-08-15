@@ -489,11 +489,11 @@ int main(int argc, char *argv[])
       continue;
     } else if ((0 == strcmp("--quiet", arg)) || (0 == strcmp("-q", arg))) {
       switch (verbosity) {
-      case VERB_QUIET:
-        verbosity = VERB_MUTE;
-        break;
       case VERB_NORMAL:
         verbosity = VERB_QUIET;
+        break;
+      case VERB_QUIET:
+        verbosity = VERB_MUTE;
         break;
       default:
         error_exit("Illegal use of --quiet/-q");
