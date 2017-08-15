@@ -484,7 +484,7 @@ int main(int argc, char *argv[])
         verbosity = VERB_MUTE;
         break;
       default:
-        error_exit("Illegal use of --quiet/-q");
+        error_exit("Illegal use of -qq");
       }
       continue;
     } else if ((0 == strcmp("--quiet", arg)) || (0 == strcmp("-q", arg))) {
@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
         verbosity = VERB_VERY;
         break;
       default:
-        error_exit("Illegal use of --verbose/-v");
+        error_exit("Illegal use of -vv");
       }
       continue;
     } else if ((0 == strcmp("--verbose", arg)) || (0 == strcmp("-v", arg))) {
