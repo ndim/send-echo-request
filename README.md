@@ -24,8 +24,9 @@ Running `send-echo-request` should be easy enough:
     # send-echo-request -vv --loop ::1 127.0.0.1
     # send-echo-request -q  --loop 192.168.1.23 192.168.1.42
 
-`send-echo-request` is licensed under GPLv2+, i.e. GNU GPL version 2 or
-(at your option) any later version. Read the LICENSE file for details.
+`send-echo-request` is licensed under GPLv2+, i.e. GNU GPL version 2
+or (at your option) any later version. Read the [LICENSE](LICENSE)
+file for details.
 
 
 Building and installing, generic Linux edition
@@ -103,5 +104,5 @@ References
   * [RFC 792 - Internet Control Message Protocol](http://tools.ietf.org/html/rfc792)
   * [RFC 1071 - Computing the Internet Checksum](http://tools.ietf.org/html/rfc1071)
   * [RFC 4443 - Internet Control Message Protocol (ICMPv6) for the Internet Protocol Version 6 (IPv6) Specification](http://tools.ietf.org/html/rfc4443)
-  * Man pages (in addition to those of the functions we run): ip(7), ipv6(7), ...
+  * Man pages (in addition to those of the functions we run): [ip(7)](http://man7.org/linux/man-pages/man7/ip.7.html), [ipv6(7)](http://man7.org/linux/man-pages/man7/ipv6.7.html), ...
   * Some local header files for the detailed struct and constant definitions
