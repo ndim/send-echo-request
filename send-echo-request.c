@@ -69,6 +69,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -268,7 +269,7 @@ int send_ping4(struct sockaddr_in *dest_addr,
 
   /* compose ICMP packet */
   struct icmphdr hdr;
-  memset(&hdr, 0, sizeof(hdr));
+  bzero(&hdr, sizeof(hdr));
 
   hdr.type             = ICMP_ECHO;         /* ICMP echo request */
   hdr.code             = 0;
@@ -338,7 +339,7 @@ int send_ping6(struct sockaddr_in6 *dest_addr,
 
   /* compose ICMPv6 packet */
   struct icmp6_hdr hdr;
-  memset(&hdr, 0, sizeof(hdr));
+  bzero(&hdr, sizeof(hdr));
 
   hdr.icmp6_type                      = ICMP6_ECHO_REQUEST;
   hdr.icmp6_code                      = 0;
@@ -446,7 +447,7 @@ int main(int argc, char *argv[])
       quietfe("realloc");                                       \
       exit(EXIT_FAILURE);                                       \
     }                                                           \
-    memset(&tasks[task_cnt], 0, sizeof(tasks[task_cnt]));       \
+    bzero(&tasks[task_cnt], sizeof(tasks[task_cnt]));       \
     tasks[task_cnt].addr_str = addrstr;                         \
   } while (0)
 
@@ -458,7 +459,7 @@ int main(int argc, char *argv[])
       struct sockaddr_in  sin;
       struct sockaddr_in6 sin6;
     } u;
-    memset(&u, 0, sizeof(u));
+    bzero(&u, sizeof(u));
 
     /* These blocks must either
      *   exit          to exit the program
