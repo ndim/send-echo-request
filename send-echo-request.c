@@ -227,7 +227,8 @@ uint16_t icmp_checksum(const uint16_t *const data, const size_t byte_sz)
 
   uint32_t accu = 0;
   for (size_t i=0; i < (byte_sz >> 1); ++i) {
-    accu = accu + data[i];
+    const uint32_t val32 = data[i];
+    accu = accu + val32;
   }
 
   /* Fold 32-bit sum to 16 bits */
