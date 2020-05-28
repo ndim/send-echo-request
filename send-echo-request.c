@@ -230,7 +230,7 @@ uint16_t icmp_checksum(const uint16_t *const data, const size_t byte_sz)
     accu = accu + data[i];
   }
 
-  /*  Fold 32-bit sum to 16 bits */
+  /* Fold 32-bit sum to 16 bits */
   while (accu >> 16) {
     accu = (accu & 0xffff) + (accu >> 16);
   }
