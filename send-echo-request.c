@@ -443,12 +443,18 @@ int main(int argc, char *argv[])
 
 #define enlarge_array(addrstr)                                  \
   do {                                                          \
-    tasks = realloc(tasks, sizeof(tasks[0]) * (task_cnt + 1));  \
+    const size_t factor_a = sizeof(tasks[0]);                   \
+    const size_t factor_b = task_cnt + 1;                       \
+    const size_t new_size = factor_a * factor_b;                \
+    if ((new_size < factor_a) || (new_size < factor_b)) {       \
+      error_exit("realloc size overflow");                      \
+    }                                                           \
+    tasks = realloc(tasks, new_size);                           \
     if (!tasks) {                                               \
       quietfe("realloc");                                       \
       exit(EXIT_FAILURE);                                       \
     }                                                           \
-    bzero(&tasks[task_cnt], sizeof(tasks[task_cnt]));       \
+    bzero(&tasks[task_cnt], sizeof(tasks[task_cnt]));           \
     tasks[task_cnt].addr_str = addrstr;                         \
   } while (0)
 
